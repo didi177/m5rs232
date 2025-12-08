@@ -7,6 +7,7 @@ import json
 import base64
 import hashlib
 
+lastMessageTimeStamp_g = ""
 
 # callback if successfully connected
 def on_connect(client, userdata, flags, reason_code, properties):
@@ -18,25 +19,31 @@ def on_connect(client, userdata, flags, reason_code, properties):
 
 # Callback für empfangene Nachrichten
 def on_message(client, userdata, message):
-    msgData = message.payload.decode()
-
-    # ecdsa public key is from config.json
-    eccPubKey = userdata
-
     try:
-        jsonMessage = json.loads(msgData)
+        # ecdsa public key is from config.json
+        eccPubKey = userdata["eccPubKey"]
+
+        jsonMessage = json.loads( message.payload.decode() )
         signature =  base64.b64decode( jsonMessage["s"].encode("ascii") )
 
         vk = VerifyingKey.from_string(eccPubKey, curve=SECP256k1)
         vk.verify(signature, jsonMessage["d"].encode("ascii"), hashfunc=hashlib.sha256)
     except BadSignatureError:
-        print(f"topic: {message.topic}, invalid message or signature: {msgData}")
+        print(f"topic: {message.topic}, invalid message or signature: {jsonMessage}")
         return
     except:
-        print(f"topic: {message.topic}, invalid message content: {msgData}")
+        print(f"topic: {message.topic}, invalid message content: {jsonMessage}")
         return
 
-    print(f"topic: {message.topic}, message: {msgData}")
+    timeStamp = jsonMessage["d"][1:16]
+    if "" != lastMessageTimeStamp_g:
+        if timeStamp <= lastMessageTimeStamp_g:
+            print(f"topic: {message.topic}, invalid timestamp: {timeStamp}")
+            return
+        
+    lastMessageTimeStamp_g = timeStamp
+    print(f"topic: {message.topic}, message: {jsonMessage}")
+
 
 
 # create a file config.json with content:
@@ -44,14 +51,14 @@ def on_message(client, userdata, message):
 
 with open("config.json", "r") as f:
     config = json.load(f)
-eccPubKey = base64.b64decode( config["eccPubKeyBase64"].encode("ascii") )
-
+eccPubKeyBase64 = config["eccPubKeyBase64"].encode("ascii")
+eccPubKey = base64.b64decode( eccPubKeyBase64 )
 
 # MQTT-Client erstellen und konfigurieren
 client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
 client.on_connect = on_connect
 client.on_message = on_message
-client.user_data_set([eccPubKey])
+client.user_data_set({"eccPubKey": eccPubKey})
 
 # Verbindung zum Broker herstellen
 broker = "iot.coreflux.cloud"
