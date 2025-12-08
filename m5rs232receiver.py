@@ -20,9 +20,18 @@ def on_connect(client, userdata, flags, reason_code, properties):
 def on_message(client, userdata, message):
     msgData = message.payload.decode()
 
-    # copy&paste public key from m5 serial-console 
-    eccPubKeyBase64  = "PZkuDf5kRiefirGN23+rNnbg293f0liaVZRC6OC32J4SS2hJxLz6vPOMGRBHwGC8Iw6P3hkE/twCAG0nPWNLnw=="
-    eccPubKey = base64.b64decode( eccPubKeyBase64.encode("ascii") )
+
+
+    # copy&paste public key from m5 serial-console
+#    eccPubKeyBase64  = "PZkuDf5kRiefirGN23+rNnbg293f0liaVZRC6OC32J4SS2hJxLz6vPOMGRBHwGC8Iw6P3hkE/twCAG0nPWNLnw=="
+#    config = dict()
+#    config["eccPubKeyBase64"] = eccPubKeyBase64
+#    with open("ecdsapubk.json", "w") as f:
+#        json.dump(config, f)
+#
+#    eccPubKey = base64.b64decode( eccPubKeyBase64.encode("ascii") )
+
+    eccPubKey = userdata
 
     try:
         jsonMessage = json.loads(msgData)
@@ -40,12 +49,19 @@ def on_message(client, userdata, message):
     print(f"topic: {message.topic}, message: {msgData}")
 
 
+# create a file config.json with content:
+# {"eccPubKeyBase64": "[copy&paste public key base64 coded from m5 serial-console]"}
+
+with open("config.json", "r") as f:
+    config = json.load(f)
+eccPubKey = base64.b64decode( config["eccPubKeyBase64"].encode("ascii") )
+
 
 # MQTT-Client erstellen und konfigurieren
 client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
 client.on_connect = on_connect
 client.on_message = on_message
-client.user_data_set([])
+client.user_data_set([eccPubKey])
 
 # Verbindung zum Broker herstellen
 broker = "iot.coreflux.cloud"
