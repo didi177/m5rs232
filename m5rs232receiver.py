@@ -23,16 +23,17 @@ def on_message(client, userdata, message):
         # ecdsa public key is from config.json
         eccPubKey = userdata["eccPubKey"]
 
-        jsonMessage = json.loads( message.payload.decode() )
+        msgData = message.payload.decode()
+        jsonMessage = json.loads( msgData )
         signature =  base64.b64decode( jsonMessage["s"].encode("ascii") )
 
         vk = VerifyingKey.from_string(eccPubKey, curve=SECP256k1)
         vk.verify(signature, jsonMessage["d"].encode("ascii"), hashfunc=hashlib.sha256)
     except BadSignatureError:
-        print(f"topic: {message.topic}, invalid message or signature: {jsonMessage}")
+        print(f"topic: {message.topic}, invalid message or signature: {msgData}")
         return
     except:
-        print(f"topic: {message.topic}, invalid message content: {jsonMessage}")
+        print(f"topic: {message.topic}, invalid message content: {msgData}")
         return
 
     timeStamp = jsonMessage["d"][1:16]
@@ -43,7 +44,7 @@ def on_message(client, userdata, message):
             return
         
     lastMessageTimeStamp_g = timeStamp
-    print(f"topic: {message.topic}, message: {jsonMessage}")
+    print(f"topic: {message.topic}, message: {msgData}")
 
 
 
