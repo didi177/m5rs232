@@ -36,6 +36,7 @@ def on_message(client, userdata, message):
         return
 
     timeStamp = jsonMessage["d"][1:16]
+    global lastMessageTimeStamp_g
     if "" != lastMessageTimeStamp_g:
         if timeStamp <= lastMessageTimeStamp_g:
             print(f"topic: {message.topic}, invalid timestamp: {timeStamp}")
