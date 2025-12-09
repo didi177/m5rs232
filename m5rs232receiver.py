@@ -13,7 +13,7 @@ lastMessageTimeStamp_g = ""
 def on_connect(client, userdata, flags, reason_code, properties):
     if reason_code == 0:
         print("successfully connected to broker")
-        client.subscribe("m5/#") # subscribe topic
+        client.subscribe("m5/#") # subscribe topic, add mac-address to filter just one device
     else:
         print(f"failed to connect to broker {reason_code}")
 
@@ -46,6 +46,10 @@ def on_message(client, userdata, message):
     lastMessageTimeStamp_g = timeStamp
     print(f"topic: {message.topic}, message: {msgData}")
 
+    # append line to file
+    filename = message.topic.replace(":", "").replace("/", ".")
+    with open(filename, "a") as f:
+        f.write(jsonMessage["d"] + "\n")
 
 
 # create a file config.json with content:
