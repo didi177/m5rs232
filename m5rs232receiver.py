@@ -47,7 +47,7 @@ def on_message(client, userdata, message):
     print(f"topic: {message.topic}, message: {msgData}")
 
     # append line to file
-    filename = message.topic.replace(":", "").replace("/", ".")
+    filename = message.topic.replace(":", "").replace("/", ".") + ".txt"
     with open(filename, "a") as f:
         f.write(jsonMessage["d"] + "\n")
 
