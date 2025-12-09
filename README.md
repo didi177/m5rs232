@@ -5,7 +5,7 @@ M5 Atom lite                            https://shop.m5stack.com/products/atom-l
 with ATOMIC RS232 Base W/O Atom lite    https://shop.m5stack.com/products/atomic-rs232-base-w-o-atom-lite  
 
 ## description  
-atom receives data from rs232 and publish it at mqtt-server via wifi  
+atom receives data from rs232 and publish it to mqtt-server via wifi  
 data have ntp-timestamp and are digital signed with ecdsa  
 
 1. receive serial data from a device, add ntp-timestamp, sign-data and send it to a mqtt-server with a m5/esp32 uc
