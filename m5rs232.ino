@@ -231,13 +231,15 @@ bool wifiConnect()
                 }
                 Serial.println();
 
-                for (size_t i=1; i<=9; i++)
+                for (size_t j=1; j<=9; j++)
                 {
-                    const String cfgWifiSsidKey = "wifi-" + String(i) + "-ssid";
-                    const String cfgWifiPwdKey = "wifi-" + String(i) + "-pwd";
+                    const String cfgWifiSsidKey = "wifi-" + String(j) + "-ssid";
+                    const String cfgWifiPwdKey = "wifi-" + String(j) + "-pwd";
                     if (config[cfgWifiSsidKey].isNull()) continue;
 
-                    if (config[cfgWifiSsidKey] == WiFi.SSID(i))
+                    Serial.println("ssid in configuration: " + String(config[cfgWifiSsidKey]));
+
+                    if (String(config[cfgWifiSsidKey]) == WiFi.SSID(i))
                     {
                         hasCfgSsids = true;
                         cfgWifiSsid = String(config[cfgWifiSsidKey]);
