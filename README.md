@@ -9,7 +9,7 @@ atom receives data from rs232 and publish it to mqtt-server via wifi
 data have ntp-timestamp and are digital signed with ecdsa to be protected against manipulation and replies
 
 1. receive serial data from a device, add ntp-timestamp, sign-data and send it to a mqtt-server with a m5/esp32 uc
-2. receive and verify data from a mqtt-server with a pyhton script 
+2. receive and verify data from a mqtt-server with a python script 
 ```
 Python-Host  <---  Public MQTT-Server  <---  M5-RS232  <---  v.24/RS232-Device
 
