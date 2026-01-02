@@ -237,19 +237,17 @@ bool wifiConnect()
                     const String cfgWifiPwdKey = "wifi-" + String(j) + "-pwd";
                     if (config[cfgWifiSsidKey].isNull()) continue;
 
-                    Serial.println("ssid in configuration: " + String(config[cfgWifiSsidKey]));
-
                     if (String(config[cfgWifiSsidKey]) == WiFi.SSID(i))
                     {
                         hasCfgSsids = true;
                         cfgWifiSsid = String(config[cfgWifiSsidKey]);
                         cfgWifiPwd = String(config[cfgWifiPwdKey]);
                         Serial.println("found ssid in configuration: " + cfgWifiSsid);
-                        continue;
+                        break;
                     }
                 }
 
-                delay(10);
+                if (true == hasCfgSsids) break;
             }
         }
 
@@ -430,6 +428,8 @@ bool mqttServerPublish(const char* serialData="")
 
 void LED(const uint32_t color)
 {
+    M5.dis.setBrightness(5); 
+    
     uint32_t grbColor = color;
     M5.dis.drawpix(0, grbColor);
 }

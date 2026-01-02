@@ -29,6 +29,22 @@ def on_message(client, userdata, message):
 
         vk = VerifyingKey.from_string(eccPubKey, curve=SECP256k1)
         vk.verify(signature, jsonMessage["d"].encode("ascii"), hashfunc=hashlib.sha256)
+
+        timeStamp = jsonMessage["d"][1:16]
+        global lastMessageTimeStamp_g
+        if "" != lastMessageTimeStamp_g:
+            if timeStamp <= lastMessageTimeStamp_g:
+                print(f"topic: {message.topic}, invalid timestamp: {timeStamp}")
+                return
+            
+        lastMessageTimeStamp_g = timeStamp
+        print(f"topic: {message.topic}, message: {msgData}")
+
+        # append line to file
+        filename = message.topic.replace(":", "").replace("/", ".") + ".txt"
+        with open(filename, "a") as f:
+            f.write(jsonMessage["d"] + "\n")
+
     except BadSignatureError:
         print(f"topic: {message.topic}, invalid message or signature: {msgData}")
         return
@@ -36,20 +52,6 @@ def on_message(client, userdata, message):
         print(f"topic: {message.topic}, invalid message content: {msgData}")
         return
 
-    timeStamp = jsonMessage["d"][1:16]
-    global lastMessageTimeStamp_g
-    if "" != lastMessageTimeStamp_g:
-        if timeStamp <= lastMessageTimeStamp_g:
-            print(f"topic: {message.topic}, invalid timestamp: {timeStamp}")
-            return
-        
-    lastMessageTimeStamp_g = timeStamp
-    print(f"topic: {message.topic}, message: {msgData}")
-
-    # append line to file
-    filename = message.topic.replace(":", "").replace("/", ".") + ".txt"
-    with open(filename, "a") as f:
-        f.write(jsonMessage["d"] + "\n")
 
 
 # create a file config.json with content:
